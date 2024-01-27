@@ -26,3 +26,25 @@ model Hotel {
 
   @@map("HOTEL")
 }
+
+model City {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt()
+  PopularLocality PopularLocality[]
+
+  @@map("CITIES")
+}
+
+model PopularLocality {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  popularLocalityName String
+  city                City     @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt()
+  cityId              String   @db.ObjectId
+
+  @@map("POPULAR_LOCALITY")
+}
