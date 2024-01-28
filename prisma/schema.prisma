@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+}
+
+model Hotel {
+  id                String           @id @default(auto()) @map("_id") @db.ObjectId
+  name              String
+  address           String
+  images            String[]
+  amenities         String[]
+  city              City?            @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  popularLocality   PopularLocality? @relation(fields: [popularLocalityId], references: [id])
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt()
+  cityId            String?          @db.ObjectId
+  popularLocalityId String?          @db.ObjectId
+
+  @@map("HOTEL")
+}
+
+model City {
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt()
+  PopularLocality PopularLocality[]
+  Hotel           Hotel[]
+
+  @@map("CITIES")
+}
+
+model PopularLocality {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  popularLocalityName String
+  city                City     @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt()
+  cityId              String   @db.ObjectId
+  Hotel               Hotel[]
+
+  @@map("POPULAR_LOCALITY")
+}
