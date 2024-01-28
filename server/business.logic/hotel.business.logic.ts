@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "../config";
 import { NotFound } from "http-errors";
 type HOTEL_TYPE = {
-  input: Prisma.HotelCreateInput;
+  input: Prisma.HotelUncheckedCreateInput;
 };
 type Ids = {
   hotelId: string;
@@ -12,9 +12,10 @@ export const HotelBusinessLogic = {
   async createHotel({ input }: HOTEL_TYPE) {
     return new Promise(async (resolve, reject) => {
       try {
-        const { address, name, images, amenities } = input;
+        const { address, name, images, amenities, cityId } = input;
         const create = await prisma.hotel.create({
           data: {
+            cityId,
             address,
             name,
             images: images ? images : [],

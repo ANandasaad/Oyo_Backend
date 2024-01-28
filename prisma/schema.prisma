@@ -21,19 +21,21 @@ model Hotel {
   address   String
   images    String[]
   amenities String[]
+  city      City     @relation(fields: [cityId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
+  cityId    String   @db.ObjectId
 
   @@map("HOTEL")
 }
 
 model City {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
-  name String
-
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt()
   PopularLocality PopularLocality[]
+  Hotel           Hotel[]
 
   @@map("CITIES")
 }
