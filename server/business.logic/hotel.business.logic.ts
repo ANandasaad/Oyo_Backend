@@ -10,6 +10,10 @@ type Ids = {
   popularlocalityId?: string;
 };
 
+type HOTEL_SEARCH_TYPE = {
+  cityName: string;
+};
+
 export const HotelBusinessLogic = {
   async createHotel({ input }: HOTEL_TYPE) {
     return new Promise(async (resolve, reject) => {
@@ -123,10 +127,35 @@ export const HotelBusinessLogic = {
       }
     });
   },
-  async getAllHotels() {
+  async getAllHotels(cityName: string) {
     return new Promise(async (resolve, reject) => {
       try {
-        const allHotels = await prisma.hotel.findMany();
+        const allHotels = await prisma.hotel.findMany({
+          where: {
+            OR: [
+              {
+                city: {
+                  name: {
+                    startsWith: cityName,
+                    mode: "insensitive",
+                  },
+                },
+              },
+              {
+                popularLocality: {
+                  popularLocalityName: {
+                    startsWith: cityName,
+                    mode: "insensitive",
+                  },
+                },
+              },
+            ],
+          },
+          include: {
+            city: true,
+            popularLocality: true,
+          },
+        });
         if (!allHotels.length) throw new NotFound("Hotel not found");
         return resolve(allHotels);
       } catch (error) {
@@ -134,5 +163,6 @@ export const HotelBusinessLogic = {
       }
     });
   },
+
   async bulkUploadHotel() {},
 };

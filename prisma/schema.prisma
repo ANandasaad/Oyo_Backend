@@ -10,9 +10,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ROLE_TYPE {
+  Customer
+  Admin
+  BusinessOwner
+}
+
 model User {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
-  name String
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  email       String    @unique
+  phoneNumber String
+  role        ROLE_TYPE @default(Customer)
+  password    String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt()
+
+  @@map("USER")
 }
 
 model Hotel {
@@ -23,12 +37,35 @@ model Hotel {
   amenities         String[]
   city              City?            @relation(fields: [cityId], references: [id], onDelete: Cascade)
   popularLocality   PopularLocality? @relation(fields: [popularLocalityId], references: [id])
+  latitude          Float?
+  longitude         Float?
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt()
   cityId            String?          @db.ObjectId
   popularLocalityId String?          @db.ObjectId
+  Room              Room[]
 
   @@map("HOTEL")
+}
+
+enum ROOM_TYPE {
+  Classic
+  Suite
+  Deluxe
+}
+
+model Room {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  roomType  ROOM_TYPE
+  facility  String[]
+  roomSize  String
+  price     Int
+  hotel     Hotel     @relation(fields: [hotelId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt()
+  hotelId   String    @db.ObjectId
+
+  @@map("ROOM")
 }
 
 model City {

@@ -84,7 +84,10 @@ export const HotelController: {
   },
   async getAllHotel(req, res, next) {
     try {
-      const response = await HotelBusinessLogic.getAllHotels();
+      const { cityName } = req.query;
+      const response = await HotelBusinessLogic.getAllHotels(
+        cityName as string
+      );
       res.json({
         success: true,
         message: "Successfully retrieved all",
