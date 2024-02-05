@@ -41,6 +41,8 @@ export const UserController: {
         message: "User signed in successfully",
         data: response,
       });
-    } catch (error) {}
+    } catch (error) {
+      next(error);
+    }
   },
 };
