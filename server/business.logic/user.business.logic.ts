@@ -11,6 +11,9 @@ type SIGN_IN = {
   email: string;
   password: string;
 };
+type Ids = {
+  userId: string;
+};
 
 export const UserLogic = {
   async signUp({ input }: SIGN_UP) {
@@ -50,7 +53,36 @@ export const UserLogic = {
           { id: isUserExist.id, role: isUserExist.role },
           configs.JWT_SECRET
         );
-        return resolve({ user: isUserExist, token });
+        const userSignIn = await prisma.user.update({
+          where: {
+            id: isUserExist.id,
+          },
+          data: {
+            isLoggedIn: true,
+          },
+        });
+        return resolve({ user: userSignIn, token });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+  async self({ userId }: Ids) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const user = await prisma.user.findUnique({
+          where: {
+            id: userId,
+          },
+          select: {
+            name: true,
+            email: true,
+            phoneNumber: true,
+            isLoggedIn: true,
+          },
+        });
+        if (!user) throw new NotFound("User does not exist");
+        return resolve(user);
       } catch (error) {
         reject(error);
       }

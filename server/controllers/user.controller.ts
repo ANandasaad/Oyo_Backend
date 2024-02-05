@@ -4,6 +4,7 @@ import { UserLogic } from "../business.logic/user.business.logic";
 export const UserController: {
   SignUp: RequestHandler;
   signIn: RequestHandler;
+  self: RequestHandler;
 } = {
   async SignUp(req, res, next) {
     try {
@@ -30,5 +31,16 @@ export const UserController: {
     } catch (error) {
       next(error);
     }
+  },
+  async self(req, res, next) {
+    try {
+      const userId = req.user?.id as string;
+      const response = await UserLogic.self({ userId });
+      res.json({
+        success: true,
+        message: "User signed in successfully",
+        data: response,
+      });
+    } catch (error) {}
   },
 };
