@@ -13,6 +13,7 @@ export const RoomLogic = {
     return new Promise(async (resolve, reject) => {
       try {
         const { hotelId, price, roomSize, roomType, facility } = input;
+
         const isHotelExist = await prisma.hotel.findUnique({
           where: {
             id: hotelId,

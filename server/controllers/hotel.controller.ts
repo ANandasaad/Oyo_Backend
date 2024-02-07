@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import { HotelBusinessLogic } from "../business.logic";
+import { UploadedFile } from "express-fileupload";
 
 export const HotelController: {
   createHotel: RequestHandler;
@@ -14,7 +15,8 @@ export const HotelController: {
   async createHotel(req, res, next) {
     try {
       const input = req.body;
-      const response = await HotelBusinessLogic.createHotel({ input });
+      const images = req.files?.images as UploadedFile[];
+      const response = await HotelBusinessLogic.createHotel({ input, images });
       res.json({
         success: true,
         message: "Hotel created successfully",

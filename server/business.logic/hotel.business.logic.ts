@@ -1,8 +1,11 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../config";
 import { NotFound } from "http-errors";
+import { UploadedFile } from "express-fileupload";
+import { mediaStore } from "../services/mediaUpload.service";
 type HOTEL_TYPE = {
   input: Prisma.HotelUncheckedCreateInput;
+  images: UploadedFile[];
 };
 type Ids = {
   hotelId?: string;
@@ -15,17 +18,43 @@ type HOTEL_SEARCH_TYPE = {
 };
 
 export const HotelBusinessLogic = {
-  async createHotel({ input }: HOTEL_TYPE) {
+  async createHotel({ input, images }: HOTEL_TYPE) {
     return new Promise(async (resolve, reject) => {
       try {
-        const { address, name, images, amenities, cityId, popularLocalityId } =
-          input;
+        const { address, name, amenities, cityId, popularLocalityId } = input;
+        let rawImages: any = [];
+
+        if (images?.length) {
+          for (let i = 0; i < images.length; i++) {
+            const img: any = images[i];
+
+            const image = img
+              ? await mediaStore.mediaUploadImage({
+                  file: img as unknown as UploadedFile,
+                  dir: "images",
+                })
+              : undefined;
+
+            rawImages.push({
+              url: image?.url || " ",
+              path: image?.path || " ",
+            });
+          }
+        } else {
+          rawImages = images
+            ? await mediaStore.mediaUploadImage({
+                file: images as unknown as UploadedFile,
+                dir: "image",
+              })
+            : undefined;
+        }
+
         const create = await prisma.hotel.create({
           data: {
             cityId: cityId ? cityId : undefined,
             address,
             name,
-            images: images ? images : [],
+            images: rawImages,
             amenities,
             popularLocalityId: popularLocalityId
               ? popularLocalityId
@@ -47,6 +76,10 @@ export const HotelBusinessLogic = {
           },
         });
         if (!isHotelExits) throw new NotFound("Hotel not found");
+        for (let image of isHotelExits.images) {
+          await mediaStore.deleteUploadImage(image.path as string);
+        }
+
         const deleteHotelById = await prisma.hotel.delete({
           where: {
             id: hotelId,
