@@ -37,8 +37,50 @@ export const RoomController: {
       next(error);
     }
   },
-  async updateRoom() {},
-  async getRoomById() {},
-  async bulkUploadRooms() {},
-  async getAllRooms() {},
+  async updateRoom(req, res, next) {
+    try {
+      const roomId = req.params.id;
+      const input = req.body;
+      const response = await RoomLogic.updateRoom({
+        roomId,
+        input,
+      });
+      res.json({
+        success: true,
+        message: "Update Successfully",
+        data: response,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  async getRoomById(req, res, next) {
+    try {
+      const id = req.params.id;
+      const response = await RoomLogic.getRoomById(id);
+      res.json({
+        success: true,
+        message: "Fetched room successfully",
+        data: response,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  async bulkUploadRooms(req, res, next) {
+    try {
+    } catch (error) {}
+  },
+  async getAllRooms(req, res, next) {
+    try {
+      const response = await RoomLogic.getAllRooms();
+      res.json({
+        success: true,
+        message: "Fetched all rooms successfully",
+        data: response,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 };

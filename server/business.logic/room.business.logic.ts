@@ -13,6 +13,11 @@ type Ids = {
   roomId: string;
 };
 
+type ROOM_UPDATE = {
+  roomId: string;
+  input: Prisma.RoomUncheckedUpdateInput;
+};
+
 export const RoomLogic = {
   async createRoom({ input, roomImages }: ROOM_TYPE) {
     return new Promise(async (resolve, reject) => {
@@ -91,8 +96,58 @@ export const RoomLogic = {
       }
     });
   },
-  async updateRoom() {},
-  async getRoomById() {},
-  async getAllRooms() {},
+  async updateRoom({ roomId, input }: ROOM_UPDATE) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { facility, price, roomSize, roomType } = input;
+        const isRoomExist = await prisma.room.findUnique({
+          where: {
+            id: roomId,
+          },
+        });
+        if (!isRoomExist) throw new NotFound("Room not found");
+        const updateRoom = await prisma.room.update({
+          where: {
+            id: roomId,
+          },
+          data: {
+            price,
+            facility,
+            roomSize,
+            roomType,
+          },
+        });
+        return resolve(updateRoom);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+  async getRoomById(id: string) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const isRoomExist = await prisma.room.findUnique({
+          where: {
+            id,
+          },
+        });
+        if (!isRoomExist) throw new NotFound("Room not found");
+        return resolve(isRoomExist);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+  async getAllRooms() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const allRooms = await prisma.room.findMany();
+        if (!allRooms.length) throw new NotFound("Room not found");
+        return resolve(allRooms);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
   async bulkUploadRooms() {},
 };
