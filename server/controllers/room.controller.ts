@@ -13,7 +13,7 @@ export const RoomController: {
   async createRoom(req, res, next) {
     try {
       const input = req.body;
-      const roomImages = req.files as unknown as UploadedFile;
+      const roomImages = req.files?.images as unknown as UploadedFile[];
       const response = await RoomLogic.createRoom({ input, roomImages });
       res.json({
         success: true,
@@ -24,7 +24,19 @@ export const RoomController: {
       next(error);
     }
   },
-  async deleteRoom() {},
+  async deleteRoom(req, res, next) {
+    try {
+      const roomId = req.params.id;
+      const response = await RoomLogic.deleteRoom({ roomId });
+      res.json({
+        success: true,
+        message: "Room deleted successfully",
+        data: response,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
   async updateRoom() {},
   async getRoomById() {},
   async bulkUploadRooms() {},

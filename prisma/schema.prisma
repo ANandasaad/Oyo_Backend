@@ -61,16 +61,16 @@ enum ROOM_TYPE {
 }
 
 model Room {
-  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  id         String       @id @default(auto()) @map("_id") @db.ObjectId
   roomType   ROOM_TYPE
   facility   String[]
   roomSize   String
   price      Int
-  roomImages String[]
-  hotel      Hotel     @relation(fields: [hotelId], references: [id])
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt()
-  hotelId    String    @db.ObjectId
+  roomImages IMAGE_TYPE[]
+  hotel      Hotel        @relation(fields: [hotelId], references: [id])
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt()
+  hotelId    String       @db.ObjectId
 
   @@map("ROOM")
 }

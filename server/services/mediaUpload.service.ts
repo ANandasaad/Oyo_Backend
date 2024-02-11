@@ -67,7 +67,9 @@ export const mediaStore = {
         };
 
         const command = new PutObjectCommand({ ...params });
+
         await s3.send(command);
+
         await invalidateFileCache(`${params.Key}`);
         return resolve({
           url: `${configs.CLOUD_FRONT_URL}/${params.Key}`,
