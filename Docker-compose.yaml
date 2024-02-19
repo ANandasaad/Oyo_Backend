@@ -1,0 +1,7 @@
+
+services:
+ img:
+  build: .
+  container_name: backend
+  ports:
+    - 3003:3003
