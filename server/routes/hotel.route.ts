@@ -10,5 +10,6 @@ router.get(
 );
 router.get("/get-hotels", HotelController.getAllHotel);
 router.get("/get-hotel-by-id/:id", HotelController.getHotelById);
+router.get("/get-all", HotelController.getAll);
 
 export default router;

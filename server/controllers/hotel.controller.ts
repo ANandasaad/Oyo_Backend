@@ -11,6 +11,7 @@ export const HotelController: {
   bulkUploadHotel: RequestHandler;
   hotelByCityId: RequestHandler;
   getHotelByPopularlocalityId: RequestHandler;
+  getAll: RequestHandler;
 } = {
   async createHotel(req, res, next) {
     try {
@@ -106,5 +107,18 @@ export const HotelController: {
   async bulkUploadHotel(req, res, next) {
     try {
     } catch (error) {}
+  },
+
+  async getAll(req, res, next) {
+    try {
+      const response = await HotelBusinessLogic.getAll();
+      res.json({
+        success: true,
+        message: "Successfully retrieved all",
+        data: response,
+      });
+    } catch (error) {
+      next(error);
+    }
   },
 };

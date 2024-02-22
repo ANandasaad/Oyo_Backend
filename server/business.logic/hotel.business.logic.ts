@@ -243,4 +243,57 @@ export const HotelBusinessLogic = {
   },
 
   async bulkUploadHotel() {},
+  async getAll() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const allHotels = await prisma.hotel.aggregateRaw({
+          pipeline: [
+            {
+              $lookup: {
+                from: "ROOM",
+                localField: "_id",
+                foreignField: "hotelId",
+                as: "hotelRoom",
+              },
+            },
+            {
+              $unwind: {
+                path: "$hotelRoom",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $project: {
+                _id: {
+                  $toString: "$_id",
+                },
+                name: 1,
+                address: 1,
+                amenities: 1,
+                latitude: 1,
+                longitude: 1,
+                cityId: {
+                  $toString: "$cityId",
+                },
+                popularLocalityId: {
+                  $toString: "$popularLocalityId",
+                },
+                images: 1,
+                "hotelRoom._id": {
+                  $toString: "$_id",
+                },
+                "hotelRoom.roomType": 1,
+                "hotelRoom.roomSize": 1,
+                "hotelRoom.price": 1,
+                "hotelRoom.roomImages": 1,
+              },
+            },
+          ],
+        });
+        return resolve(allHotels);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
 };
