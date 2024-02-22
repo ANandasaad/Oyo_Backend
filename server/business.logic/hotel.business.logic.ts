@@ -14,14 +14,27 @@ type Ids = {
 };
 
 type HOTEL_SEARCH_TYPE = {
-  cityName: string;
+  cityName?: string;
+  latitude?: number;
+  longitude?: number;
+  skip?: number;
+  take?: number;
+  locality?: string;
 };
 
 export const HotelBusinessLogic = {
   async createHotel({ input, images }: HOTEL_TYPE) {
     return new Promise(async (resolve, reject) => {
       try {
-        const { address, name, amenities, cityId, popularLocalityId } = input;
+        const {
+          address,
+          name,
+          amenities,
+          cityId,
+          popularLocalityId,
+          latitude,
+          longitude,
+        } = input;
         let rawImages: any = [];
 
         if (images?.length) {
@@ -59,6 +72,8 @@ export const HotelBusinessLogic = {
             popularLocalityId: popularLocalityId
               ? popularLocalityId
               : undefined,
+            latitude: Number(latitude),
+            longitude: Number(longitude),
           },
         });
         return resolve(create);
@@ -110,7 +125,6 @@ export const HotelBusinessLogic = {
   async hotelByCityId({ cityId }: Ids) {
     return new Promise(async (resolve, reject) => {
       try {
-        console.log(cityId);
         const isCityExits = await prisma.city.findUnique({
           where: {
             id: cityId,
@@ -160,16 +174,34 @@ export const HotelBusinessLogic = {
       }
     });
   },
-  async getAllHotels(cityName: string) {
+  async getAllHotels({
+    cityName,
+    latitude,
+    locality,
+    longitude,
+    skip,
+    take,
+  }: HOTEL_SEARCH_TYPE) {
     return new Promise(async (resolve, reject) => {
       try {
+        const skipItems = Math.max(
+          Number(take) * Number((skip as number) - 1),
+          0
+        );
+
+        const skipLimit = {};
+        if (Number(skip) && Number(take)) {
+          Object.assign(skipLimit, { skip: skipItems, take: Number(take) });
+        }
+
         const allHotels = await prisma.hotel.findMany({
+          ...skipLimit,
           where: {
             OR: [
               {
                 city: {
                   name: {
-                    startsWith: cityName,
+                    contains: cityName,
                     mode: "insensitive",
                   },
                 },
@@ -177,9 +209,17 @@ export const HotelBusinessLogic = {
               {
                 popularLocality: {
                   popularLocalityName: {
-                    startsWith: cityName,
+                    contains: locality,
                     mode: "insensitive",
                   },
+                },
+              },
+              {
+                latitude: {
+                  equals: latitude,
+                },
+                longitude: {
+                  equals: longitude,
                 },
               },
             ],
@@ -189,8 +229,13 @@ export const HotelBusinessLogic = {
             popularLocality: true,
           },
         });
+
         if (!allHotels.length) throw new NotFound("Hotel not found");
-        return resolve(allHotels);
+        const pagination = {
+          skip: skipItems,
+          take: Number(take),
+        };
+        return resolve({ allHotels, pagination });
       } catch (error) {
         reject(error);
       }

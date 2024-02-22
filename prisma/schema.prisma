@@ -50,6 +50,7 @@ model Hotel {
   cityId            String?          @db.ObjectId
   popularLocalityId String?          @db.ObjectId
   Room              Room[]
+  Rating            Rating[]
 
   @@map("HOTEL")
 }
@@ -96,4 +97,16 @@ model PopularLocality {
   Hotel               Hotel[]
 
   @@map("POPULAR_LOCALITY")
+}
+
+model Rating {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  hotel     Hotel    @relation(fields: [hotelId], references: [id])
+  hotelId   String   @db.ObjectId
+  review    String?
+  rating    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("RATING")
 }
