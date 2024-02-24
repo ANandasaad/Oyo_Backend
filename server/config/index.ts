@@ -14,6 +14,8 @@ const configs = {
   SECRET_ACCESS_KEY: `${process.env.SECRET_ACCESS_KEY}`,
   DISTRIBUTION_ID: `${process.env.DISTRIBUTION_ID}`,
   CLOUD_FRONT_URL: `${process.env.CLOUD_FRONT_URL}`,
+  RAZOR_KEY:`${process.env.RAZOR_API_KEY}`,
+  RAZOR_SECRET:`${process.env.RAZOR_API_SECRET}`
 };
 
 export { configs, prisma };

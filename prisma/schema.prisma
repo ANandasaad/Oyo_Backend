@@ -110,3 +110,14 @@ model Rating {
 
   @@map("RATING")
 }
+
+model Payment {
+ id        String   @id @default(auto()) @map("_id") @db.ObjectId
+ razorpayOrderId String
+ razorpayPaymentId String
+ razorpaySignature String
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+
+ @@map("PAYMENT")
+}
