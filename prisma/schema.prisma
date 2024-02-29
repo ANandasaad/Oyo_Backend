@@ -31,6 +31,7 @@ model User {
   password    String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt()
+  Rating      Rating[]
 
   @@map("USER")
 }
@@ -100,24 +101,27 @@ model PopularLocality {
 }
 
 model Rating {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  hotel     Hotel    @relation(fields: [hotelId], references: [id])
-  hotelId   String   @db.ObjectId
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  hotel     Hotel        @relation(fields: [hotelId], references: [id])
+  hotelId   String       @db.ObjectId
   review    String?
   rating    String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  images    IMAGE_TYPE[]
+  user      User         @relation(fields: [userId], references: [id])
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  userId    String       @db.ObjectId
 
   @@map("RATING")
 }
 
 model Payment {
- id        String   @id @default(auto()) @map("_id") @db.ObjectId
- razorpayOrderId String
- razorpayPaymentId String
- razorpaySignature String
- createdAt DateTime @default(now())
- updatedAt DateTime @updatedAt
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  razorpayOrderId   String
+  razorpayPaymentId String
+  razorpaySignature String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
- @@map("PAYMENT")
+  @@map("PAYMENT")
 }
